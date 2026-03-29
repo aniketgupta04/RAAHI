@@ -212,7 +212,7 @@ const CleanMap = ({ onLocationUpdate }) => {
               ⚠️ Google Maps API Key Missing
             </h4>
             <p style={{ margin: '0', fontSize: '0.9rem', color: '#a16207' }}>
-              No API key found in environment variables. Please add VITE_GOOGLE_MAPS_API_KEY to your .env file.
+              No Google Maps key was found. Add it to the client API keys file referenced by VITE_API_KEYS_FILE_PATH.
             </p>
           </div>
         )}

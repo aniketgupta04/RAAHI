@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const aiService = require('../services/aiService');
 const { body, validationResult } = require('express-validator');
+const { getOptionalApiKey } = require('../config/apiKeys');
 
 // Validation middleware
 const validateChatbotMessage = [
@@ -234,11 +235,13 @@ router.get('/recommendations', (req, res) => {
 
 // Health check for AI service
 router.get('/health', (req, res) => {
+  const geminiApiKey = getOptionalApiKey('geminiApiKey', process.env.GEMINI_API_KEY);
+
   res.json({
     success: true,
     service: 'AI Service',
     status: 'operational',
-    geminiConfigured: process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your_gemini_api_key_here',
+    geminiConfigured: !!(geminiApiKey && geminiApiKey !== 'your_gemini_api_key_here'),
     timestamp: new Date().toISOString()
   });
 });

@@ -1,4 +1,5 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { getOptionalApiKey } = require('../config/apiKeys');
 
 class AIService {
   constructor() {
@@ -10,7 +11,7 @@ class AIService {
 
   initialize() {
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = getOptionalApiKey('geminiApiKey', process.env.GEMINI_API_KEY);
       
       if (!apiKey || apiKey === 'your_gemini_api_key_here') {
         console.warn('⚠️ Gemini API key not configured. Chatbot will use fallback responses.');

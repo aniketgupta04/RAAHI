@@ -6,7 +6,7 @@ const Home = ({ onPageChange }) => {
   const [error, setError] = useState(null);
   const [location, setLocation] = useState({ lat: null, lon: null });
 
-  const OPENWEATHER_API_KEY = "200577e014c1c4c3d23e9474ed18dc2c";
+  const openWeatherApiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
   // Get user's location
   useEffect(() => {
@@ -41,8 +41,13 @@ const Home = ({ onPageChange }) => {
 
       try {
         setLoading(true);
+
+        if (!openWeatherApiKey) {
+          throw new Error('Weather API key not configured');
+        }
+
         const response = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lon}&appid=${OPENWEATHER_API_KEY}&units=metric`
+          `https://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lon}&appid=${openWeatherApiKey}&units=metric`
         );
 
         if (!response.ok) throw new Error('Weather data not available');
@@ -59,7 +64,7 @@ const Home = ({ onPageChange }) => {
     };
 
     fetchWeather();
-  }, [location]);
+  }, [location, openWeatherApiKey]);
 
   return (
     <section id="home" className="page active">

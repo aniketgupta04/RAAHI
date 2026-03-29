@@ -29,7 +29,7 @@ const MapAPITester = () => {
 
       if (!API_KEY) {
         setApiStatus('ERROR: API key missing');
-        addTestResult('API Key Check', 'No API key found in environment variables', 'error');
+        addTestResult('API Key Check', 'No API key found in the client API keys file configured by VITE_API_KEYS_FILE_PATH', 'error');
         return;
       }
 

@@ -29,7 +29,7 @@ class DatabaseManager {
           process.env.FIREBASE_PROJECT_ID !== 'your-project-id';
         const hasFirebaseServiceAccountPath =
           process.env.FIREBASE_SERVICE_ACCOUNT_PATH &&
-          process.env.FIREBASE_SERVICE_ACCOUNT_PATH !== 'Firebase Key/your-service-account.json';
+          process.env.FIREBASE_SERVICE_ACCOUNT_PATH !== 'API Keys/your-service-account.json';
 
         if (hasFirebaseEnvConfig || hasFirebaseServiceAccountPath) {
           this.firebaseServices = initializeFirebase();

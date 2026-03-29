@@ -12,6 +12,8 @@ dist
 dist-ssr
 .env
 *.local
+API Keys/*.json
+!API Keys/*.example.json
 
 # Editor directories and files
 .vscode/*

@@ -373,7 +373,7 @@ const AdminMapDashboard = () => {
             </h3>
             <p style={{ color: '#64748b', maxWidth: '600px' }}>
               {!apiKey 
-                ? 'No API key found in environment variables. Please add VITE_GOOGLE_MAPS_API_KEY to your .env file.'
+                ? 'No Google Maps key was found. Add it to the client API keys file referenced by VITE_API_KEYS_FILE_PATH.'
                 : `Error loading Google Maps: ${loadError}`
               }
             </p>

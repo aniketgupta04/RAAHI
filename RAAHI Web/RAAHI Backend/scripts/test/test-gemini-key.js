@@ -1,8 +1,9 @@
 require('dotenv').config();
+const { getOptionalApiKey } = require('../../config/apiKeys');
 
 console.log('🔍 Checking Gemini API Key Configuration...\n');
 
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = getOptionalApiKey('geminiApiKey', process.env.GEMINI_API_KEY);
 
 // Check if API key exists and is not placeholder
 if (!apiKey || apiKey === 'your_actual_gemini_api_key_here' || apiKey === 'your_gemini_api_key_here') {
@@ -10,7 +11,7 @@ if (!apiKey || apiKey === 'your_actual_gemini_api_key_here' || apiKey === 'your_
   console.log('📋 Current value:', apiKey || 'undefined');
   console.log('\n🔧 To fix this:');
   console.log('1. Get your API key from: https://makersuite.google.com/app/apikey');
-  console.log('2. Open .env file in your backend folder');
+  console.log('2. Open the API keys JSON file configured in your backend .env');
   console.log('3. Replace the placeholder with your actual API key');
   console.log('4. Save and restart your server');
   process.exit(1);
