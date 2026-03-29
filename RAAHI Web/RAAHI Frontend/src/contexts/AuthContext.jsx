@@ -42,7 +42,9 @@ export const AuthProvider = ({ children }) => {
         // For real tokens, verify with backend
         try {
           const profileData = await apiService.users.getProfile();
-          setUser(profileData);
+          const resolvedUser = profileData?.user || profileData;
+          setUser(resolvedUser);
+          localStorage.setItem('user', JSON.stringify(resolvedUser));
           setIsAuthenticated(true);
         } catch (error) {
           // Token is invalid, clear storage
@@ -130,12 +132,17 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoading(true);
       
-      const { fullName, touristData, ...otherData } = userData;
-      
-      // Parse fullName into firstName and lastName
-      const nameParts = fullName.split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
+      const { touristData, firstName: directFirstName, lastName: directLastName, fullName, ...otherData } = userData;
+
+      const firstName = directFirstName?.trim() || fullName?.trim().split(/\s+/)[0] || '';
+      const lastName = directLastName?.trim() || fullName?.trim().split(/\s+/).slice(1).join(' ') || '';
+
+      if (!firstName || !lastName) {
+        return {
+          success: false,
+          error: 'Please enter both first and last name to register.'
+        };
+      }
       
       // Prepare data according to backend User model structure
       const backendData = {

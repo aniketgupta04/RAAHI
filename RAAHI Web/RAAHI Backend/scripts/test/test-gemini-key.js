@@ -31,7 +31,7 @@ if (!apiKey || apiKey === 'your_actual_gemini_api_key_here' || apiKey === 'your_
 // Test AI Service initialization
 console.log('\n🤖 Testing AI Service...');
 try {
-  const aiService = require('./services/aiService');
+  const aiService = require('../../services/aiService');
   
   // Give it a moment to initialize
   setTimeout(() => {

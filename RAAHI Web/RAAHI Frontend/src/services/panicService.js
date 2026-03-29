@@ -12,7 +12,7 @@ import {
   getDocs,
   setDoc
 } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { auth, db } from '../config/firebase';
 import { getCurrentUserUID, initializeFirebaseAuth } from './authService';
 
 /**

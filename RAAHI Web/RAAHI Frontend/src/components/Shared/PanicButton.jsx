@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { db } from '../../firebase-config'; // Assuming you have this file
+import { db } from '../../config/firebase';
 import { doc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const PanicButton = () => {
@@ -168,7 +168,7 @@ const PanicButton = () => {
           aria-label="Emergency panic button"
           disabled={isTriggering || isWarning}
           style={{ 
-            backgroundColor: hasTriggering ? '#28a745' : isWarning ? '#ffa500' : '#dc3545',
+            backgroundColor: hasTriggered ? '#28a745' : isWarning ? '#ffa500' : '#dc3545',
             opacity: isTriggering ? 0.7 : 1,
             cursor: (isTriggering || isWarning) ? 'not-allowed' : 'pointer',
             transform: isWarning ? 'scale(1.1)' : 'scale(1)',

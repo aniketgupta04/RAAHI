@@ -1,11 +1,10 @@
-const mongoose = require('mongoose');
-const User = require('./models/User');
-require('dotenv').config();
+const User = require('../../models/User');
+const { connectMongoDB, disconnectMongoDB } = require('../../config/mongodb');
 
 async function addTouristDepartmentUser() {
   try {
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGODB_URI, {});
+    await connectMongoDB();
     
     console.log('Connected to MongoDB');
     
@@ -20,7 +19,7 @@ async function addTouristDepartmentUser() {
         role: existingUser.role,
         location: existingUser.location
       });
-      await mongoose.connection.close();
+      await disconnectMongoDB();
       return;
     }
     
@@ -52,14 +51,12 @@ async function addTouristDepartmentUser() {
     });
     
     // Close connection
-    await mongoose.connection.close();
+    await disconnectMongoDB();
     console.log('Connection closed');
     
   } catch (error) {
     console.error('❌ Error creating tourist department user:', error);
-    if (mongoose.connection.readyState === 1) {
-      await mongoose.connection.close();
-    }
+    await disconnectMongoDB();
     process.exit(1);
   }
 }

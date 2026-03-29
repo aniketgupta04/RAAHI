@@ -4,8 +4,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-require('dotenv').config();
-const mongoose = require("mongoose");
+require('./config/env');
 
 // Import database manager
 const databaseManager = require('./config/database');
@@ -223,8 +222,7 @@ module.exports = app;
 
 // Start the server if this file is run directly
 if (require.main === module) {
-  let server;
   startServer().then((s) => {
-    server = s;
+    return s;
   });
 }

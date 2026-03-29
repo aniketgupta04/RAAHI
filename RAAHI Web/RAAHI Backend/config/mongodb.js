@@ -1,41 +1,77 @@
 const mongoose = require('mongoose');
+const { getRequiredEnv } = require('./env');
 
-const connectMongoDB = async () => {
+const DEFAULT_MONGO_OPTIONS = {
+  maxPoolSize: 10,
+  serverSelectionTimeoutMS: 30000,
+  socketTimeoutMS: 45000,
+  connectTimeoutMS: 30000,
+  family: 4
+};
+
+let listenersRegistered = false;
+
+const getMongoUri = () => getRequiredEnv('MONGODB_URI');
+
+const registerConnectionListeners = () => {
+  if (listenersRegistered) {
+    return;
+  }
+
+  mongoose.connection.on('connected', () => {
+    console.log('Mongoose connected to MongoDB');
+  });
+
+  mongoose.connection.on('error', (err) => {
+    console.error('Mongoose connection error:', err);
+  });
+
+  mongoose.connection.on('disconnected', () => {
+    console.log('Mongoose disconnected from MongoDB');
+  });
+
+  listenersRegistered = true;
+};
+
+const connectMongoDB = async (options = {}) => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      maxPoolSize: 10, // Maintain up to 10 socket connections
-      serverSelectionTimeoutMS: 30000, // Keep trying to send operations for 30 seconds
-      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-      connectTimeoutMS: 30000, // How long to wait for initial connection
-      family: 4 // Use IPv4, skip trying IPv6
+    if (mongoose.connection.readyState === 1) {
+      return mongoose.connection;
+    }
+
+    registerConnectionListeners();
+
+    const conn = await mongoose.connect(getMongoUri(), {
+      ...DEFAULT_MONGO_OPTIONS,
+      ...options
     });
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
-    
-    // Handle connection events
-    mongoose.connection.on('connected', () => {
-      console.log('Mongoose connected to MongoDB');
-    });
-
-    mongoose.connection.on('error', (err) => {
-      console.error('Mongoose connection error:', err);
-    });
-
-    mongoose.connection.on('disconnected', () => {
-      console.log('Mongoose disconnected from MongoDB');
-    });
-
-    // Handle process termination
-    process.on('SIGINT', async () => {
-      await mongoose.connection.close();
-      console.log('MongoDB connection closed through app termination');
-      process.exit(0);
-    });
-
+    return conn;
   } catch (error) {
     console.error('Error connecting to MongoDB:', error.message);
-    throw error; // Let the caller handle the error
+    throw error;
   }
 };
 
-module.exports = connectMongoDB;
+const disconnectMongoDB = async () => {
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.connection.close();
+  }
+};
+
+const getMongoDb = () => {
+  if (!mongoose.connection.db) {
+    throw new Error('MongoDB is not connected');
+  }
+
+  return mongoose.connection.db;
+};
+
+module.exports = {
+  DEFAULT_MONGO_OPTIONS,
+  connectMongoDB,
+  disconnectMongoDB,
+  getMongoDb,
+  getMongoUri
+};

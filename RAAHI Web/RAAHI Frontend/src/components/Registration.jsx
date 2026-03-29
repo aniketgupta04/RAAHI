@@ -5,9 +5,10 @@ import { useAuth } from '../contexts/AuthContext';
 const Registration = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    fullName: 'Anike', 
-    idType: 'Passport', 
-    idNumber: 'A1234567', 
+    firstName: 'Anike',
+    lastName: 'Gupta',
+    idType: 'Passport',
+    idNumber: 'A1234567',
     dob: '1990-01-01', 
     gender: 'Male', 
     nationality: 'Indian', 
@@ -36,11 +37,36 @@ const Registration = () => {
     }
   }, [currentStep]);
 
+  const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+
+  const formatAadhaarNumber = (value) => {
+    const digitsOnly = value.replace(/\D/g, '').slice(0, 12);
+    const groups = digitsOnly.match(/.{1,4}/g) || [];
+    return groups.join('-');
+  };
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    let nextValue = type === 'checkbox' ? checked : value;
+
+    if (name === 'idNumber' && formData.idType === 'Aadhaar') {
+      nextValue = formatAadhaarNumber(value);
+    }
+
+    if (name === 'idType' && value === 'Aadhaar') {
+      nextValue = value;
+      setFormData(prevData => ({
+        ...prevData,
+        idType: value,
+        idNumber: formatAadhaarNumber(prevData.idNumber)
+      }));
+      return;
+    }
+
     setFormData(prevData => ({
       ...prevData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: nextValue
     }));
   };
 
@@ -82,8 +108,15 @@ const Registration = () => {
     const newErrors = {};
     
     if (step === 1) {
-      if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+      if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+      if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
       if (!formData.idNumber.trim()) newErrors.idNumber = 'ID number is required';
+      if (formData.idType === 'Aadhaar' && formData.idNumber) {
+        const aadhaarDigits = formData.idNumber.replace(/\D/g, '');
+        if (aadhaarDigits.length !== 12) {
+          newErrors.idNumber = 'Aadhaar number must be exactly 12 digits';
+        }
+      }
       if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
       if (!formData.email.trim()) newErrors.email = 'Email is required';
       if (!formData.password.trim()) newErrors.password = 'Password is required';
@@ -97,6 +130,11 @@ const Registration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateStep(1)) {
+      setCurrentStep(1);
+      return;
+    }
     
     if (!formData.agree) {
       setErrors({ agree: 'You must agree to the terms and conditions' });
@@ -109,7 +147,8 @@ const Registration = () => {
     try {
       // Prepare registration data for backend
       const registrationData = {
-        fullName: formData.fullName,
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
         email: formData.email,
         password: formData.password,
         phone: formData.phone,
@@ -163,9 +202,14 @@ const Registration = () => {
               <div className="card-header"><h3 className="card-title">Step 1: Personal Details & KYC</h3></div>
               <div className="card-content">
                 <div className="form-group">
-                  <label htmlFor="fullName">Full Name</label>
-                  <input type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleInputChange} />
-                  <div className="error-message">{errors.fullName}</div>
+                  <label htmlFor="firstName">First Name</label>
+                  <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleInputChange} />
+                  <div className="error-message">{errors.firstName}</div>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="lastName">Last Name</label>
+                  <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleInputChange} />
+                  <div className="error-message">{errors.lastName}</div>
                 </div>
                 <div className="form-row">
                   <div className="form-group">
@@ -177,8 +221,17 @@ const Registration = () => {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="idNumber">Passport/Aadhaar No.</label>
-                    <input type="text" id="idNumber" name="idNumber" value={formData.idNumber} onChange={handleInputChange} />
+                    <label htmlFor="idNumber">{formData.idType === 'Aadhaar' ? 'Aadhaar Number' : 'Passport/Voter ID No.'}</label>
+                    <input
+                      type="text"
+                      id="idNumber"
+                      name="idNumber"
+                      value={formData.idNumber}
+                      onChange={handleInputChange}
+                      inputMode={formData.idType === 'Aadhaar' ? 'numeric' : 'text'}
+                      maxLength={formData.idType === 'Aadhaar' ? 14 : 30}
+                      placeholder={formData.idType === 'Aadhaar' ? '1234-5678-9012' : 'Enter ID number'}
+                    />
                     <div className="error-message">{errors.idNumber}</div>
                   </div>
                 </div>
@@ -299,7 +352,7 @@ const Registration = () => {
               <div className="card-header"><h3 className="card-title">Step 4: Review & Confirm</h3></div>
               <div className="card-content">
                 <div id="review-summary">
-                  <div><strong>Name:</strong> {formData.fullName}</div>
+                  <div><strong>Name:</strong> {fullName}</div>
                   <div><strong>ID:</strong> {formData.idType} - {formData.idNumber}</div>
                   <div><strong>DOB:</strong> {formData.dob}</div>
                   <div><strong>Phone:</strong> {formData.phone}</div>
@@ -339,7 +392,7 @@ const Registration = () => {
                   <div className="id-number">ST-PAS-{formData.idNumber.slice(-4)}</div>
                 </div>
                 <div className="id-body">
-                  <div className="id-name">{formData.fullName}</div>
+                  <div className="id-name">{fullName}</div>
                   <div className="qr-placeholder">QR</div>
                 </div>
               </div>
@@ -354,7 +407,7 @@ const Registration = () => {
             <h3 className="card-title">Registration Details</h3>
           </div>
           <div className="card-content" id="final-details">
-            <div><strong>Name:</strong> {formData.fullName}</div>
+            <div><strong>Name:</strong> {fullName}</div>
             <div><strong>ID:</strong> ST-PAS-{formData.idNumber.slice(-4)}</div>
           </div>
         </div>
@@ -413,7 +466,7 @@ const Registration = () => {
                           <div className="id-number" id="preview-id">ST-TEMP-0001</div>
                         </div>
                         <div className="id-body">
-                          <div className="id-name" id="preview-name">{formData.fullName || 'Tourist'}</div>
+                          <div className="id-name" id="preview-name">{fullName || 'Tourist'}</div>
                           <div className="qr-placeholder">QR Code</div>
                         </div>
                       </div>

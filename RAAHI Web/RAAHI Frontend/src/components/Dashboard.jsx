@@ -21,16 +21,20 @@ const Dashboard = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [mapLocation, setMapLocation] = useState(null);
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (isAuthLoading) {
+      return;
+    }
+
     if (!isAuthenticated) {
       navigate('/login.html');
       return;
     }
     loadDashboardData();
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isAuthLoading, navigate]);
 
   const loadDashboardData = async () => {
     try {
@@ -115,7 +119,7 @@ const Dashboard = () => {
     console.log('Location updated:', locationData);
   };
 
-  if (isLoading) {
+  if (isAuthLoading || isLoading) {
     return (
       <div className="simple-loading-screen">
         <div className="loading-content">

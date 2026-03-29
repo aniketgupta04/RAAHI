@@ -43,6 +43,7 @@ A comprehensive backend API for smart tourism applications, featuring AI-powered
 
 2. **Configure environment variables**
    - Copy `.env.example` to `.env`
+   - Keep your MongoDB connection string in `.env` as `MONGODB_URI`
    - Update Firebase configuration with your project details
    - MongoDB is already configured with your Atlas connection
 
@@ -149,6 +150,8 @@ smart-tourism-backend/
 | `FIREBASE_PROJECT_ID` | Firebase project ID | - |
 | `JWT_SECRET` | JWT signing secret | - |
 | `RATE_LIMIT_MAX_REQUESTS` | Rate limit per window | 100 |
+
+MongoDB configuration is centralized in `config/env.js` and `config/mongodb.js`, so the backend and maintenance scripts all read the same connection string from one place.
 
 ### Security Features
 - Helmet.js for security headers

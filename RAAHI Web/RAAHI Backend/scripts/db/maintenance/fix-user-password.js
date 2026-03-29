@@ -1,16 +1,15 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-require('dotenv').config();
+const { connectMongoDB, disconnectMongoDB, getMongoDb } = require('../../../config/mongodb');
 
 async function fixUserPassword() {
   try {
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGODB_URI, {});
+    await connectMongoDB();
     
     console.log('Connected to MongoDB');
     
     // Get the users collection
-    const db = mongoose.connection.db;
+    const db = getMongoDb();
     const usersCollection = db.collection('users');
     
     // Find the user
@@ -48,10 +47,11 @@ async function fixUserPassword() {
     console.log('🔑 Password test:', isMatch ? '✅ Valid' : '❌ Invalid');
     
     // Close connection
-    await mongoose.connection.close();
+    await disconnectMongoDB();
     console.log('Connection closed');
     
   } catch (error) {
+    await disconnectMongoDB();
     console.error('Error:', error);
     process.exit(1);
   }

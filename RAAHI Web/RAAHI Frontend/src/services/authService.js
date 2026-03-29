@@ -1,6 +1,6 @@
 // Firebase Auth Service for Panic Button System
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth } from '../config/firebase';
 
 /**
  * Initialize Firebase Auth with anonymous sign-in

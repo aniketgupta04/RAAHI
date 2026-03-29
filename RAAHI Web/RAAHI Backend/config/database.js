@@ -1,4 +1,5 @@
-const connectMongoDB = require('./mongodb');
+const mongoose = require('mongoose');
+const { connectMongoDB, disconnectMongoDB } = require('./mongodb');
 const { initializeFirebase } = require('./firebase');
 
 class DatabaseManager {
@@ -14,7 +15,7 @@ class DatabaseManager {
 
       // Connect to MongoDB
       try {
-        await connectMongoDB();
+        this.mongoConnection = await connectMongoDB();
         console.log('✅ MongoDB connection established');
       } catch (mongoError) {
         console.warn('⚠️  MongoDB connection failed:', mongoError.message);
@@ -23,7 +24,14 @@ class DatabaseManager {
 
       // Initialize Firebase (optional for now)
       try {
-        if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PROJECT_ID !== 'your-project-id') {
+        const hasFirebaseEnvConfig =
+          process.env.FIREBASE_PROJECT_ID &&
+          process.env.FIREBASE_PROJECT_ID !== 'your-project-id';
+        const hasFirebaseServiceAccountPath =
+          process.env.FIREBASE_SERVICE_ACCOUNT_PATH &&
+          process.env.FIREBASE_SERVICE_ACCOUNT_PATH !== 'Firebase Key/your-service-account.json';
+
+        if (hasFirebaseEnvConfig || hasFirebaseServiceAccountPath) {
           this.firebaseServices = initializeFirebase();
           console.log('✅ Firebase services initialized');
         } else {
@@ -64,8 +72,7 @@ class DatabaseManager {
 
   async disconnect() {
     try {
-      const mongoose = require('mongoose');
-      await mongoose.connection.close();
+      await disconnectMongoDB();
       console.log('🔌 MongoDB connection closed');
 
       this.isConnected = false;
@@ -78,7 +85,6 @@ class DatabaseManager {
   }
 
   isHealthy() {
-    const mongoose = require('mongoose');
     return {
       mongodb: mongoose.connection.readyState === 1,
       firebase: this.firebaseServices !== null,
@@ -97,7 +103,6 @@ class DatabaseManager {
     if (health.mongodb) {
       try {
         const start = Date.now();
-        const mongoose = require('mongoose');
         await mongoose.connection.db.admin().ping();
         results.mongodb = {
           status: 'connected',

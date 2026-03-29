@@ -1,18 +1,14 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+const { connectMongoDB, disconnectMongoDB, getMongoDb } = require('../../../config/mongodb');
 
 async function fixUsernameIndex() {
   try {
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await connectMongoDB();
     
     console.log('Connected to MongoDB');
     
     // Get the users collection
-    const db = mongoose.connection.db;
+    const db = getMongoDb();
     const usersCollection = db.collection('users');
     
     // List all indexes
@@ -38,10 +34,11 @@ async function fixUsernameIndex() {
     console.log(JSON.stringify(users, null, 2));
     
     // Close connection
-    await mongoose.connection.close();
+    await disconnectMongoDB();
     console.log('Connection closed');
     
   } catch (error) {
+    await disconnectMongoDB();
     console.error('Error:', error);
     process.exit(1);
   }
