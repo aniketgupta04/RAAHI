@@ -31,14 +31,7 @@ export const AuthProvider = ({ children }) => {
 
       if (token && savedUser) {
         const userData = JSON.parse(savedUser);
-        
-        // If it's a mock token, just restore the user state
-        if (token.startsWith('mock-jwt-token-')) {
-          setUser(userData);
-          setIsAuthenticated(true);
-          return;
-        }
-        
+
         // For real tokens, verify with backend
         try {
           const profileData = await apiService.users.getProfile();
@@ -63,31 +56,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       setIsLoading(true);
-      
-      // Mock authentication for development (check for specific credentials)
-      if (credentials.email === 'anike@example.com' && credentials.password === 'asdfghjkl') {
-        const mockUser = {
-          id: '1',
-          email: 'anike@example.com',
-          fullName: 'Anike Kumar',
-          firstName: 'Anike',
-          lastName: 'Kumar',
-          phone: '+919876543210',
-          touristId: 'TID-2024-001',
-          userType: 'tourist',
-          role: 'user'
-        };
-        
-        // Store mock token and user data
-        localStorage.setItem('authToken', 'mock-jwt-token-' + Date.now());
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        
-        setUser(mockUser);
-        setIsAuthenticated(true);
-        
-        return { success: true, message: 'Login successful' };
-      }
-      
+
       // If not using mock credentials, try backend authentication
       try {
         const response = await apiService.auth.login(credentials);
@@ -182,9 +151,13 @@ export const AuthProvider = ({ children }) => {
       // Extract specific error message from backend response
       const errorData = error.response?.data;
       if (errorData) {
+        const detailedMessage = Array.isArray(errorData.details) && errorData.details.length > 0
+          ? errorData.details.join(' ')
+          : null;
+
         return { 
           success: false, 
-          error: errorData.message || 'Registration failed',
+          error: detailedMessage || errorData.message || errorData.error || 'Registration failed',
           action: errorData.action
         };
       }

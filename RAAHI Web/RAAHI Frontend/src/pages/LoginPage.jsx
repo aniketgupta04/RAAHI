@@ -57,14 +57,46 @@ const LoginPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-surface text-on-background">
-      <header className="w-full bg-surface-container-lowest px-6 py-6">
-        <div className="mx-auto flex max-w-7xl justify-center">
+      <header className="w-full border-b border-outline-variant/30 bg-surface-container-lowest px-6 py-5">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
             <span className="material-symbols-outlined text-3xl text-primary">shield_with_heart</span>
             <span className="font-headline text-xl font-bold tracking-tight text-primary">
               Raahi - Tourist Safety
             </span>
           </Link>
+
+          <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-surface-container-low"
+            >
+              Home
+            </Link>
+
+            {!isLoading && !isAuthenticated && (
+              <>
+                <Link
+                  to="/register"
+                  className="px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-surface-container-low"
+                >
+                  Register
+                </Link>
+                <span className="border border-primary bg-primary px-4 py-2 text-sm font-semibold text-on-primary">
+                  Login
+                </span>
+              </>
+            )}
+
+            {!isLoading && isAuthenticated && (
+              <Link
+                to="/profile"
+                className="border border-primary px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-on-primary"
+              >
+                Profile
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 
@@ -149,6 +181,13 @@ const LoginPage = () => {
                     arrow_forward
                   </span>
                 </button>
+
+                <Link
+                  to="/register"
+                  className="flex w-full items-center justify-center rounded border border-primary px-5 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-on-primary"
+                >
+                  New here? Register
+                </Link>
 
                 <div className="relative py-2">
                   <div className="absolute inset-0 flex items-center">
