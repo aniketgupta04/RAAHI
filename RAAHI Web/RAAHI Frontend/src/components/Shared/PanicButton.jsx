@@ -168,6 +168,19 @@ const PanicButton = () => {
           aria-label="Emergency panic button"
           disabled={isTriggering || isWarning}
           style={{ 
+            position: 'fixed',
+            right: '1rem',
+            bottom: '1rem',
+            zIndex: 50,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            borderRadius: '9999px',
+            border: '2px solid rgba(220, 53, 69, 0.3)',
+            padding: '0.75rem 1.25rem',
+            color: '#ffffff',
+            fontWeight: 600,
+            boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)',
             backgroundColor: hasTriggered ? '#28a745' : isWarning ? '#ffa500' : '#dc3545',
             opacity: isTriggering ? 0.7 : 1,
             cursor: (isTriggering || isWarning) ? 'not-allowed' : 'pointer',
@@ -187,8 +200,24 @@ const PanicButton = () => {
       </div>
 
       {isWarning && (
-        <div className="panic-warning-overlay">
-          <div className="panic-warning-modal">
+        <div className="panic-warning-overlay" style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.45)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 60,
+          padding: '1rem'
+        }}>
+          <div className="panic-warning-modal" style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            width: '100%',
+            maxWidth: '520px',
+            padding: '1.5rem',
+            boxShadow: '0 20px 25px rgba(0, 0, 0, 0.15)'
+          }}>
             <div className="warning-icon">⚠️</div>
             <h3>Emergency Alert Warning</h3>
             <p>You accidentally activated the panic button?</p>

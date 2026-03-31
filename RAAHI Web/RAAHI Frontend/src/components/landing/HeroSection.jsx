@@ -1,4 +1,13 @@
-const HeroSection = ({ content, onAccessSystem, onRegister, onEmergencyAccess, onLearnMore }) => {
+const HeroSection = ({
+  content,
+  isAuthenticated,
+  onAccessSystem,
+  onProfile,
+  onRegister,
+  onAccessDashboard,
+  onEmergencyAccess,
+  onLearnMore,
+}) => {
   return (
     <section className="relative overflow-hidden bg-primary px-6 py-24 text-on-primary md:py-32 sm:px-8">
       <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary-container opacity-50" aria-hidden="true" />
@@ -15,17 +24,17 @@ const HeroSection = ({ content, onAccessSystem, onRegister, onEmergencyAccess, o
         <div className="mt-10 flex flex-wrap gap-4">
           <button
             type="button"
-            onClick={onAccessSystem}
+            onClick={isAuthenticated ? onProfile : onAccessSystem}
             className="bg-surface-container-lowest px-8 py-4 text-lg font-bold text-primary transition-colors hover:bg-surface-bright"
           >
-            Login
+            {isAuthenticated ? 'Profile' : 'Login'}
           </button>
           <button
             type="button"
-            onClick={onRegister}
+            onClick={isAuthenticated ? onAccessDashboard : onRegister}
             className="bg-surface-container-low px-8 py-4 text-lg font-bold text-primary transition-colors hover:bg-surface-container"
           >
-            Register
+            {isAuthenticated ? 'Access Dashboard' : 'Register'}
           </button>
           <button
             type="button"
